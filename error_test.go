@@ -148,7 +148,7 @@ func TestUnprocessableEntity(t *testing.T) {
 
 	if status := rr.Code; status != http.StatusUnprocessableEntity {
 		t.Errorf("Handler returned wrong status code: got %v wanted %v",
-			status, http.StatusOK)
+			status, http.StatusUnprocessableEntity)
 	}
 
 	expected := `{"success":false,"code":422,"message":"An error occured"}`
@@ -173,7 +173,7 @@ func TestConflict(t *testing.T) {
 
 	if status := rr.Code; status != http.StatusConflict {
 		t.Errorf("Handler returned wrong status code: got %v wanted %v",
-			status, http.StatusOK)
+			status, http.StatusConflict)
 	}
 
 	expected := `{"success":false,"code":409,"message":"An error occured"}`
