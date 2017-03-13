@@ -10,7 +10,13 @@ type SuccessResponse struct {
 
 // Created returns a 201 Created response
 func (resp *HTTPResponse) Created(v interface{}) {
-	resp.SetStatusCode(http.StatusCreated).
-		SetBody(resp.MarshallJSON(&SuccessResponse{true, v})).
+	resp.WriteSuccessResponse(http.StatusCreated, v)
+}
+
+// WriteSuccessResponse is the error response writer
+func (resp *HTTPResponse) WriteSuccessResponse(code int, v interface{}) {
+	resp.SetStatusCode(code)
+	body := &SuccessResponse{true, v}
+	resp.SetBody(resp.MarshallJSON(body)).
 		WriteResponse()
 }
