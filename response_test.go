@@ -1,6 +1,8 @@
 package respond_test
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -8,11 +10,32 @@ import (
 	resp "github.com/nicklaw5/go-respond"
 )
 
-func TestSetHeaders(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
+func newRequest(t *testing.T, method string) *http.Request {
+	req, err := http.NewRequest(method, "/", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	return req
+}
+
+func validateStatusCode(responseStatusCode int, expectedStatusCode int) error {
+	if status := responseStatusCode; status != expectedStatusCode {
+		return errors.New(fmt.Sprintf("Handler returned wrong status code: got %v wanted %v",
+			status, expectedStatusCode))
+	}
+	return nil
+}
+
+func validateResponseBody(responseBody string, expectedBody string) error {
+	if responseBody != expectedBody {
+		return errors.New(fmt.Sprintf("Handler returned unexpected body: got %v wanted %v",
+			responseBody, expectedBody))
+	}
+	return nil
+}
+
+func TestSetHeaders(t *testing.T) {
+	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -33,22 +56,17 @@ func TestSetHeaders(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	expected := "headers-two"
-	if rr.Header().Get("X-Two-1") != expected {
-		t.Errorf("Handler returned unexpected header: got %v wanted %v",
-			rr.Header().Get("X-Two-1"), expected)
+	if err := validateResponseBody(rr.Header().Get("X-Two-1"), expected); err != nil {
+		t.Fatal(err.Error())
 	}
 
-	if rr.Header().Get("X-Two-2") != expected {
-		t.Errorf("Handler returned unexpected header: got %v wanted %v",
-			rr.Header().Get("X-Two-2"), expected)
+	if err := validateResponseBody(rr.Header().Get("X-Two-2"), expected); err != nil {
+		t.Fatal(err.Error())
 	}
 }
 
 func TestAddHeader(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -59,17 +77,13 @@ func TestAddHeader(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	expected := "Pong"
-	if rr.Header().Get("Ping") != expected {
-		t.Errorf("Handler returned unexpected header: got %v wanted %v",
-			rr.Header().Get("Ping"), expected)
+	if err := validateResponseBody(rr.Header().Get("Ping"), expected); err != nil {
+		t.Fatal(err.Error())
 	}
 }
 
 func TestDeleteHeader(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -80,8 +94,7 @@ func TestDeleteHeader(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	expected := ""
-	if rr.Header().Get("Content-Type") != expected {
-		t.Errorf("Handler returned unexpected header: got %v wanted %v",
-			rr.Header().Get("Content-Type"), expected)
+	if err := validateResponseBody(rr.Header().Get("Content-Type"), expected); err != nil {
+		t.Fatal(err.Error())
 	}
 }

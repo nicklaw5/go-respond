@@ -15,10 +15,7 @@ type User struct {
 }
 
 func TestOk(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -26,23 +23,18 @@ func TestOk(t *testing.T) {
 	})
 	handler.ServeHTTP(rr, req)
 
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code: got %v wanted %v",
-			status, http.StatusOK)
+	if err := validateStatusCode(rr.Code, http.StatusOK); err != nil {
+		t.Fatal(err.Error())
 	}
 
 	expected := `{"success":true}`
-	if rr.Body.String() != expected {
-		t.Errorf("Handler returned unexpected body: got %v wanted %v",
-			rr.Body.String(), expected)
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
 	}
 }
 
 func TestCreated(t *testing.T) {
-	req, err := http.NewRequest("POST", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -51,23 +43,18 @@ func TestCreated(t *testing.T) {
 	})
 	handler.ServeHTTP(rr, req)
 
-	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("Handler returned wrong status code: got %v wanted %v",
-			status, http.StatusOK)
+	if err := validateStatusCode(rr.Code, http.StatusCreated); err != nil {
+		t.Fatal(err.Error())
 	}
 
 	expected := `{"success":true,"data":{"id":1,"name":"Billy","email":"billy@example.com"}}`
-	if rr.Body.String() != expected {
-		t.Errorf("Handler returned unexpected body: got %v wanted %v",
-			rr.Body.String(), expected)
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
 	}
 }
 
 func TestAccepted(t *testing.T) {
-	req, err := http.NewRequest("POST", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -76,23 +63,18 @@ func TestAccepted(t *testing.T) {
 	})
 	handler.ServeHTTP(rr, req)
 
-	if status := rr.Code; status != http.StatusAccepted {
-		t.Errorf("Handler returned wrong status code: got %v wanted %v",
-			status, http.StatusAccepted)
+	if err := validateStatusCode(rr.Code, http.StatusAccepted); err != nil {
+		t.Fatal(err.Error())
 	}
 
 	expected := `{"success":true}`
-	if rr.Body.String() != expected {
-		t.Errorf("Handler returned unexpected body: got %v wanted %v",
-			rr.Body.String(), expected)
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
 	}
 }
 
 func TestNoContent(t *testing.T) {
-	req, err := http.NewRequest("POST", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -101,8 +83,7 @@ func TestNoContent(t *testing.T) {
 	})
 	handler.ServeHTTP(rr, req)
 
-	if status := rr.Code; status != http.StatusNoContent {
-		t.Errorf("Handler returned wrong status code: got %v wanted %v",
-			status, http.StatusNoContent)
+	if err := validateStatusCode(rr.Code, http.StatusNoContent); err != nil {
+		t.Fatal(err.Error())
 	}
 }
