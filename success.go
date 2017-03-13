@@ -5,7 +5,7 @@ import "net/http"
 // SuccessResponse is a standard HTTP JSON response
 type SuccessResponse struct {
 	Success bool        `json:"success"`
-	Data    interface{} `json:"data"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 // Created returns a 201 Created response
