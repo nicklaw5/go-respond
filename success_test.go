@@ -14,6 +14,30 @@ type User struct {
 	Email string `json:"email"`
 }
 
+func TestOk(t *testing.T) {
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp.NewResponse(w).Ok(nil)
+	})
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("Handler returned wrong status code: got %v wanted %v",
+			status, http.StatusOK)
+	}
+
+	expected := `{"success":true}`
+	if rr.Body.String() != expected {
+		t.Errorf("Handler returned unexpected body: got %v wanted %v",
+			rr.Body.String(), expected)
+	}
+}
+
 func TestCreated(t *testing.T) {
 	req, err := http.NewRequest("POST", "/", nil)
 	if err != nil {

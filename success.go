@@ -8,6 +8,11 @@ type SuccessResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
+// Ok returns a 200 Ok response
+func (resp *HTTPResponse) Ok(v interface{}) {
+	resp.WriteSuccessResponse(http.StatusOK, v)
+}
+
 // Created returns a 201 Created response
 func (resp *HTTPResponse) Created(v interface{}) {
 	resp.WriteSuccessResponse(http.StatusCreated, v)
