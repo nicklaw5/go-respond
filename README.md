@@ -37,7 +37,7 @@ func main() {
 }
 ```
 
-The goal of `go-respond` is to take this kind of grunt work out handlers. By using `go-respond` the above example can written more succinctly as:
+The goal of `go-respond` is to take this kind of grunt work out handlers. By using `go-respond` the above example can be written more succinctly as:
 
 ```go
 package main
