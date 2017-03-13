@@ -19,15 +19,6 @@ func NewResponse(w http.ResponseWriter) *HTTPResponse {
 	return &HTTPResponse{Writer: w}
 }
 
-// IsJSON set the response type to json
-func (resp *HTTPResponse) IsJSON(isJSON bool) *HTTPResponse {
-	if isJSON {
-		resp.JSON = true
-		resp.SetJSONHeader()
-	}
-	return resp
-}
-
 // SetJSONHeader set the response type to json and attached the json header
 func (resp *HTTPResponse) SetJSONHeader() *HTTPResponse {
 	resp.AddHeader("Content-Type", "application/json; charset=utf-8")
@@ -50,7 +41,6 @@ func (resp *HTTPResponse) SetBody(body []byte) *HTTPResponse {
 // exists before this method is called will removed. Use AddHeader to append
 // any existing headers
 func (resp *HTTPResponse) SetHeaders(headers map[string]string) *HTTPResponse {
-
 	// Remove any existing headers
 	if len(resp.Headers) > 0 {
 		for key := range resp.Headers {
@@ -79,9 +69,7 @@ func (resp *HTTPResponse) AddHeader(key string, value string) *HTTPResponse {
 
 // WriteResponse write the HTTP response headers and body
 func (resp *HTTPResponse) WriteResponse() {
-	// TODO: check status code, headers and body are set
-	// TODO: set headers separately
-	// resp.Writer.Header().Set("Content-Type", "application/json")
+	resp.SetJSONHeader()
 	resp.Writer.WriteHeader(resp.StatusCode)
 	resp.Writer.Write(resp.Body)
 }

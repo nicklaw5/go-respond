@@ -8,26 +8,6 @@ import (
 	resp "github.com/nicklaw5/go-respond"
 )
 
-func TestIsJSON(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w).IsJSON(true)
-		res.Created(nil)
-	})
-	handler.ServeHTTP(rr, req)
-
-	expected := "application/json; charset=utf-8"
-	if rr.Header().Get("Content-Type") != expected {
-		t.Errorf("Handler returned unexpected header: got %v wanted %v",
-			rr.Header().Get("Content-Type"), expected)
-	}
-}
-
 func TestSetHeaders(t *testing.T) {
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -73,15 +53,15 @@ func TestAddHeader(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		res := resp.NewResponse(w)
-		res.AddHeader("Content-Type", "application/json")
+		res.AddHeader("Ping", "Pong")
 		res.Created(nil)
 	})
 	handler.ServeHTTP(rr, req)
 
-	expected := "application/json"
-	if rr.Header().Get("Content-Type") != expected {
+	expected := "Pong"
+	if rr.Header().Get("Ping") != expected {
 		t.Errorf("Handler returned unexpected header: got %v wanted %v",
-			rr.Header().Get("Content-Type"), expected)
+			rr.Header().Get("Ping"), expected)
 	}
 }
 
@@ -94,9 +74,8 @@ func TestDeleteHeader(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		res := resp.NewResponse(w)
-		res.AddHeader("Content-Type", "application/json")
-		res.DeleteHeader("Content-Type")
 		res.Created(nil)
+		res.DeleteHeader("Content-Type")
 	})
 	handler.ServeHTTP(rr, req)
 
