@@ -62,3 +62,47 @@ func TestCreated(t *testing.T) {
 			rr.Body.String(), expected)
 	}
 }
+
+func TestAccepted(t *testing.T) {
+	req, err := http.NewRequest("POST", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := resp.NewResponse(w)
+		res.Accepted(nil)
+	})
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusAccepted {
+		t.Errorf("Handler returned wrong status code: got %v wanted %v",
+			status, http.StatusAccepted)
+	}
+
+	expected := `{"success":true}`
+	if rr.Body.String() != expected {
+		t.Errorf("Handler returned unexpected body: got %v wanted %v",
+			rr.Body.String(), expected)
+	}
+}
+
+func TestNoContent(t *testing.T) {
+	req, err := http.NewRequest("POST", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := resp.NewResponse(w)
+		res.NoContent()
+	})
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusNoContent {
+		t.Errorf("Handler returned wrong status code: got %v wanted %v",
+			status, http.StatusNoContent)
+	}
+}
