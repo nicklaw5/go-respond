@@ -4,56 +4,98 @@ A Go package for handling common HTTP JSON responses.
 
 [![Build Status](https://travis-ci.org/nicklaw5/go-respond.svg?branch=master)](https://travis-ci.org/nicklaw5/go-respond) [![Coverage Status](https://coveralls.io/repos/github/nicklaw5/go-respond/badge.svg)](https://coveralls.io/github/nicklaw5/go-respond)
 
+## Installation
+
+```bash
+go get github.com/nicklaw5/go-respond
+```
+
 ## Usage
 
-HTTP handlers can be messy, uncomfortable to work with, and requires more than just a few lines of code to accomplish a basic JSON response. Take the below example as one case in point.
-
-This simple query returns a `200 OK` response, with `{"success":true}` as the body and also sets the appropriate `application/json` header:
+The goal of `go-respond` is to take most of grunt work out preparing your JSON response. Here's a simple example:
 
 ```go
 package main
 
 import (
 	"net/http"
+
+	resp "github.com/nicklaw5/go-respond"
 )
 
-type Response struct {
-    Success bool `json: success`
+type response struct {
+	Success bool `json:"success"`
 }
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        response, err := json.Marshal(&Response{true})
-        if err != nil {
-            panic(err)
-        }
-
-        w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-        w.WriteHeader(http.StatusOK)
-        w.Write(response)
+		resp.NewResponse(w).
+			Ok(&response{true})
 	})
 
 	http.ListenAndServe(":8080", nil)
 }
 ```
 
-The goal of `go-respond` is to take this kind of grunt work out handlers. By using `go-respond` the above example can be written more succinctly as:
+## Response Methods
+
+| Response Code | Method Name |
+| :---------- | :------------ |
+| 200 | Ok() |
+| 201 | Created() |
+| 202 | Accepted() |
+| 204 | NoContent() |
+| 400 | BadRequest() |
+| 401 | Unauthorized() |
+| 403 | Forbidden() |
+| 404 | NotFound() |
+| 405 | MethodNotAllowed() |
+| 409 | Conflict() |
+| 422 | UnprocessableEntity() |
+| 500 | InternalServerError() |
+
+## Handling Errors
+
+Your best option for handling errors that may occur when marshalling the JSON response, is to use [Negroni's Recovery middleware](https://github.com/urfave/negroni#recovery). Here's an example:
 
 ```go
 package main
 
 import (
-	"net/http"
+  "net/http"
 
-	res "github.com/nicklaw5/go-respond"
+  "github.com/urfave/negroni"
+  resp "github.com/nicklaw5/go-respond"
 )
 
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		res.NewResponse(w).Ok(nil)
-	})
+type User struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
 
-	http.ListenAndServe(":8080", nil)
+func main() {
+  mux := http.NewServeMux()
+  mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+	  users := []User{
+		  {1, "Billy", "billy@example.com"},
+		  {2, "Joan", "joan@example.com"},
+	  }
+
+	  resp.NewResponse(w).
+		  Created(users)
+  })
+
+  n := negroni.New()
+  recovery := negroni.NewRecovery()
+  recovery.ErrorHandlerFunc = func(error interface{}) {
+      // do something with the unexpected error
+  }
+
+  n.Use(recovery)
+  n.UseHandler(mux)
+
+  http.ListenAndServe(":8080", n)
 }
 ```
 
