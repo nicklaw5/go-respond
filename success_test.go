@@ -8,18 +8,13 @@ import (
 	resp "github.com/nicklaw5/go-respond"
 )
 
-type User struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
 func TestOk(t *testing.T) {
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).Ok(nil)
+		resp.NewResponse(w).
+			Ok(nil)
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -27,10 +22,15 @@ func TestOk(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":true}`
-	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+	if err := validateResponseBody(rr.Body.String(), ""); err != nil {
 		t.Fatal(err.Error())
 	}
+}
+
+type User struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 func TestCreated(t *testing.T) {
@@ -38,8 +38,13 @@ func TestCreated(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.Created(&User{1, "Billy", "billy@example.com"})
+		users := []User{
+			{1, "Billy", "billy@example.com"},
+			{2, "Joan", "joan@example.com"},
+		}
+
+		resp.NewResponse(w).
+			Created(users)
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -47,7 +52,8 @@ func TestCreated(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":true,"data":{"id":1,"name":"Billy","email":"billy@example.com"}}`
+	expected := `[{"id":1,"name":"Billy","email":"billy@example.com"},` +
+		`{"id":2,"name":"Joan","email":"joan@example.com"}]`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -67,8 +73,7 @@ func TestAccepted(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":true}`
-	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+	if err := validateResponseBody(rr.Body.String(), ""); err != nil {
 		t.Fatal(err.Error())
 	}
 }
@@ -86,4 +91,9 @@ func TestNoContent(t *testing.T) {
 	if err := validateStatusCode(rr.Code, http.StatusNoContent); err != nil {
 		t.Fatal(err.Error())
 	}
+
+	if err := validateResponseBody(rr.Body.String(), ""); err != nil {
+		t.Fatal(err.Error())
+	}
+
 }

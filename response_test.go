@@ -19,9 +19,9 @@ func newRequest(t *testing.T, method string) *http.Request {
 }
 
 func validateStatusCode(responseStatusCode int, expectedStatusCode int) error {
-	if status := responseStatusCode; status != expectedStatusCode {
+	if responseStatusCode != expectedStatusCode {
 		return errors.New(fmt.Sprintf("Handler returned wrong status code: got %v wanted %v",
-			status, expectedStatusCode))
+			responseStatusCode, expectedStatusCode))
 	}
 	return nil
 }
@@ -34,50 +34,47 @@ func validateResponseBody(responseBody string, expectedBody string) error {
 	return nil
 }
 
-func TestSetHeaders(t *testing.T) {
-	req := newRequest(t, "GET")
+func validateResponseHeader(responseHeaderValue string, expectedHeaderValue string) error {
+	if responseHeaderValue != expectedHeaderValue {
+		return errors.New(fmt.Sprintf("Handler returned unexpected body: got %v wanted %v",
+			responseHeaderValue, expectedHeaderValue))
+	}
+	return nil
+}
+
+func TestContentTyoeHeader(t *testing.T) {
+	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		headers := map[string]string{
-			"X-One-1": "headers-one",
-			"X-One-2": "headers-one",
-		}
-		res.SetHeaders(headers)
-
-		headers = map[string]string{
-			"X-Two-1": "headers-two",
-			"X-Two-2": "headers-two",
-		}
-		res.SetHeaders(headers)
-		res.Created(nil)
+		resp.NewResponse(w).
+			Ok(nil)
 	})
 	handler.ServeHTTP(rr, req)
 
-	expected := "headers-two"
-	if err := validateResponseBody(rr.Header().Get("X-Two-1"), expected); err != nil {
-		t.Fatal(err.Error())
-	}
-
-	if err := validateResponseBody(rr.Header().Get("X-Two-2"), expected); err != nil {
+	contentType := "application/json; charset=utf-8"
+	if err := validateResponseHeader(rr.Header().Get("Content-Type"), contentType); err != nil {
 		t.Fatal(err.Error())
 	}
 }
 
 func TestAddHeader(t *testing.T) {
-	req := newRequest(t, "GET")
+	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.AddHeader("Ping", "Pong")
-		res.Created(nil)
+		resp.NewResponse(w).
+			AddHeader("foo", "bar").
+			AddHeader("ping", "pong").
+			Ok(nil)
 	})
 	handler.ServeHTTP(rr, req)
 
-	expected := "Pong"
-	if err := validateResponseBody(rr.Header().Get("Ping"), expected); err != nil {
+	if err := validateResponseHeader(rr.Header().Get("ping"), "pong"); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if err := validateResponseHeader(rr.Header().Get("foo"), "bar"); err != nil {
 		t.Fatal(err.Error())
 	}
 }
@@ -88,13 +85,15 @@ func TestDeleteHeader(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		res := resp.NewResponse(w)
-		res.Created(nil)
-		res.DeleteHeader("Content-Type")
+
+		res.AddHeader("foo", "bar").
+			Ok(nil)
+
+		res.DeleteHeader("foo")
 	})
 	handler.ServeHTTP(rr, req)
 
-	expected := ""
-	if err := validateResponseBody(rr.Header().Get("Content-Type"), expected); err != nil {
+	if err := validateResponseBody(rr.Header().Get("foo"), ""); err != nil {
 		t.Fatal(err.Error())
 	}
 }
