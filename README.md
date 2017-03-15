@@ -12,7 +12,7 @@ go get github.com/nicklaw5/go-respond
 
 ## Usage
 
-The goal of `go-respond` is to take most of grunt work out preparing your JSON response. Here's a simple example:
+The goal of `go-respond` is to take most of the grunt work out preparing your JSON response. Here's a simple example:
 
 ```go
 package main
@@ -56,7 +56,7 @@ func main() {
 
 ## Handling Errors
 
-Your best option for handling errors that may occur when marshalling the JSON response, is to use [Negroni's Recovery middleware](https://github.com/urfave/negroni#recovery). Here's an example:
+The best option for handling errors that may occur while marshalling the JSON response, is to use [Negroni's Recovery middleware](https://github.com/urfave/negroni#recovery). Here's an example:
 
 ```go
 package main
