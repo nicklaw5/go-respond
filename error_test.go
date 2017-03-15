@@ -8,13 +8,18 @@ import (
 	resp "github.com/nicklaw5/go-respond"
 )
 
+type Error struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 func TestBadRequest(t *testing.T) {
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.BadRequest("Bad request")
+		resp.NewResponse(w).
+			BadRequest(&Error{400, "An error occured"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -22,7 +27,7 @@ func TestBadRequest(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":false,"code":400,"message":"Bad request"}`
+	expected := `{"code":400,"message":"An error occured"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -33,8 +38,8 @@ func TestUnauthorized(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.Unauthorized("Unauthorized")
+		resp.NewResponse(w).
+			Unauthorized(&Error{401, "Unauthorized"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -42,7 +47,7 @@ func TestUnauthorized(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":false,"code":401,"message":"Unauthorized"}`
+	expected := `{"code":401,"message":"Unauthorized"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -53,8 +58,8 @@ func TestForbidden(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.Forbidden("Forbidden")
+		resp.NewResponse(w).
+			Forbidden(&Error{401, "Forbidden"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -62,7 +67,7 @@ func TestForbidden(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":false,"code":403,"message":"Forbidden"}`
+	expected := `{"code":401,"message":"Forbidden"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -73,8 +78,8 @@ func TestNotFound(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.NotFound("Not found")
+		resp.NewResponse(w).
+			NotFound(&Error{404, "Not found"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -82,7 +87,7 @@ func TestNotFound(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":false,"code":404,"message":"Not found"}`
+	expected := `{"code":404,"message":"Not found"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -93,8 +98,8 @@ func TestMethodNotAllowed(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.MethodNotAllowed("Method not allowed")
+		resp.NewResponse(w).
+			MethodNotAllowed(&Error{405, "Method not allowed"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -102,27 +107,7 @@ func TestMethodNotAllowed(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":false,"code":405,"message":"Method not allowed"}`
-	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
-		t.Fatal(err.Error())
-	}
-}
-
-func TestUnprocessableEntity(t *testing.T) {
-	req := newRequest(t, "POST")
-
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.UnprocessableEntity("An error occured")
-	})
-	handler.ServeHTTP(rr, req)
-
-	if err := validateStatusCode(rr.Code, http.StatusUnprocessableEntity); err != nil {
-		t.Fatal(err.Error())
-	}
-
-	expected := `{"success":false,"code":422,"message":"An error occured"}`
+	expected := `{"code":405,"message":"Method not allowed"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -134,7 +119,7 @@ func TestConflict(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		res := resp.NewResponse(w)
-		res.Conflict("An error occured")
+		res.Conflict(&Error{409, "Username already take"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -142,7 +127,27 @@ func TestConflict(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":false,"code":409,"message":"An error occured"}`
+	expected := `{"code":409,"message":"Username already take"}`
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
+func TestUnprocessableEntity(t *testing.T) {
+	req := newRequest(t, "POST")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp.NewResponse(w).
+			UnprocessableEntity(&Error{422, "Unprocessable entity"})
+	})
+	handler.ServeHTTP(rr, req)
+
+	if err := validateStatusCode(rr.Code, http.StatusUnprocessableEntity); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	expected := `{"code":422,"message":"Unprocessable entity"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -153,8 +158,8 @@ func TestInternalServerError(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
-		res.InternalServerError("An unexpected error occured")
+		resp.NewResponse(w).
+			InternalServerError(&Error{500, "An unexpected error occured"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -162,7 +167,7 @@ func TestInternalServerError(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"success":false,"code":500,"message":"An unexpected error occured"}`
+	expected := `{"code":500,"message":"An unexpected error occured"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
