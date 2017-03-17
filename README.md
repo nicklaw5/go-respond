@@ -2,7 +2,10 @@
 
 A Go package for handling common HTTP JSON responses.
 
-[![Build Status](https://travis-ci.org/nicklaw5/go-respond.svg?branch=master)](https://travis-ci.org/nicklaw5/go-respond) [![Coverage Status](https://coveralls.io/repos/github/nicklaw5/go-respond/badge.svg)](https://coveralls.io/github/nicklaw5/go-respond)
+[![GoDoc](https://godoc.org/github.com/nicklaw5/go-respond?status.svg)](https://godoc.org/github.com/nicklaw5/go-respond)
+[![Build Status](https://travis-ci.org/nicklaw5/go-respond.svg?branch=master)](https://travis-ci.org/nicklaw5/go-respond)
+[![Coverage Status](https://coveralls.io/repos/github/nicklaw5/go-respond/badge.svg)](https://coveralls.io/github/nicklaw5/go-respond)
+[![Go Report Card](https://goreportcard.com/badge/github.com/nicklaw5/go-respond)](https://goreportcard.com/report/github.com/nicklaw5/go-respond)
 
 ## Installation
 
@@ -23,14 +26,21 @@ import (
 	resp "github.com/nicklaw5/go-respond"
 )
 
-type response struct {
-	Success bool `json:"success"`
+type User struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/users", func(w http.ResponseWriter, r *http.Request) {
+		users := []User{
+  		    {1, "Billy", "billy@example.com"},
+  		    {2, "Joan", "joan@example.com"},
+  	  	}
+
 		resp.NewResponse(w).
-			Ok(&response{true})
+			Ok(users)
 	})
 
 	http.ListenAndServe(":8080", nil)
@@ -57,6 +67,10 @@ func main() {
 | 500 | InternalServerError() |
 | 501 | NotImplemented() |
 
+See [here](https://httpstatuses.com/) for a complete list of HTTP responses, along with an explanation of each.
+
+Please submit a PR if you want to add to this list. Only the most common response types have been included.
+
 ## Handling Errors
 
 The best option for handling errors that may occur while marshalling the JSON response, is to use [Negroni's Recovery middleware](https://github.com/urfave/negroni#recovery). Here's an example:
@@ -71,22 +85,15 @@ import (
   resp "github.com/nicklaw5/go-respond"
 )
 
-type User struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+type Response struct {
+	Success bool `json:"success"`
 }
 
 func main() {
   mux := http.NewServeMux()
   mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-	  users := []User{
-		  {1, "Billy", "billy@example.com"},
-		  {2, "Joan", "joan@example.com"},
-	  }
-
 	  resp.NewResponse(w).
-		  Created(users)
+		  Ok(&Response{true})
   })
 
   n := negroni.New()

@@ -5,13 +5,13 @@ import (
 	"net/http"
 )
 
-// Response is our HTTP response
+// Response is the HTTP response
 type Response struct {
 	Writer  http.ResponseWriter
 	Headers map[string]string
 }
 
-// NewResponse create and return an
+// NewResponse creates and returns a new response
 func NewResponse(w http.ResponseWriter) *Response {
 	return &Response{
 		Writer: w,
@@ -21,7 +21,7 @@ func NewResponse(w http.ResponseWriter) *Response {
 	}
 }
 
-// DeleteHeader deletes a single provided header
+// DeleteHeader deletes a single header from the response
 func (resp *Response) DeleteHeader(key string) *Response {
 	resp.Writer.Header().Del(key)
 	return resp
