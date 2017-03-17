@@ -19,7 +19,7 @@ func TestBadRequest(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		resp.NewResponse(w).
-			BadRequest(&Error{400, "An error occured"})
+			BadRequest(&Error{400, "An error occurred"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -27,7 +27,7 @@ func TestBadRequest(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"code":400,"message":"An error occured"}`
+	expected := `{"code":400,"message":"An error occurred"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -59,7 +59,7 @@ func TestForbidden(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		resp.NewResponse(w).
-			Forbidden(&Error{401, "Forbidden"})
+			Forbidden(&Error{403, "Forbidden"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -67,7 +67,7 @@ func TestForbidden(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"code":401,"message":"Forbidden"}`
+	expected := `{"code":403,"message":"Forbidden"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -133,6 +133,46 @@ func TestConflict(t *testing.T) {
 	}
 }
 
+func TestLengthRequired(t *testing.T) {
+	req := newRequest(t, "POST")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := resp.NewResponse(w)
+		res.LengthRequired(&Error{411, "Content-Type header not long enough"})
+	})
+	handler.ServeHTTP(rr, req)
+
+	if err := validateStatusCode(rr.Code, http.StatusLengthRequired); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	expected := `{"code":411,"message":"Content-Type header not long enough"}`
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
+func TestPreconditionFailed(t *testing.T) {
+	req := newRequest(t, "POST")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := resp.NewResponse(w)
+		res.PreconditionFailed(&Error{412, "X-Auth-Key header is not present"})
+	})
+	handler.ServeHTTP(rr, req)
+
+	if err := validateStatusCode(rr.Code, http.StatusPreconditionFailed); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	expected := `{"code":412,"message":"X-Auth-Key header is not present"}`
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
 func TestUnprocessableEntity(t *testing.T) {
 	req := newRequest(t, "POST")
 
@@ -159,7 +199,7 @@ func TestInternalServerError(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		resp.NewResponse(w).
-			InternalServerError(&Error{500, "An unexpected error occured"})
+			InternalServerError(&Error{500, "An unexpected error occurred"})
 	})
 	handler.ServeHTTP(rr, req)
 
@@ -167,7 +207,27 @@ func TestInternalServerError(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	expected := `{"code":500,"message":"An unexpected error occured"}`
+	expected := `{"code":500,"message":"An unexpected error occurred"}`
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
+func TestNotImplemented(t *testing.T) {
+	req := newRequest(t, "POST")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp.NewResponse(w).
+			NotImplemented(&Error{501, "Unsupported request"})
+	})
+	handler.ServeHTTP(rr, req)
+
+	if err := validateStatusCode(rr.Code, http.StatusNotImplemented); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	expected := `{"code":501,"message":"Unsupported request"}`
 	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
 		t.Fatal(err.Error())
 	}

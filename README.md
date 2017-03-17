@@ -51,8 +51,11 @@ func main() {
 | 404 | NotFound() |
 | 405 | MethodNotAllowed() |
 | 409 | Conflict() |
+| 411 | LengthRequired() |
+| 412 | PreconditionFailed() |
 | 422 | UnprocessableEntity() |
 | 500 | InternalServerError() |
+| 501 | NotImplemented() |
 
 ## Handling Errors
 

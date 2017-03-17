@@ -32,6 +32,16 @@ func (resp *Response) Conflict(v interface{}) {
 	resp.writeResponse(http.StatusConflict, v)
 }
 
+// LengthRequired returns a 411 Length Required JSON response
+func (resp *Response) LengthRequired(v interface{}) {
+	resp.writeResponse(http.StatusLengthRequired, v)
+}
+
+// PreconditionFailed returns a 412 Precondition Failed JSON response
+func (resp *Response) PreconditionFailed(v interface{}) {
+	resp.writeResponse(http.StatusPreconditionFailed, v)
+}
+
 // UnprocessableEntity returns a 422 Unprocessable Entity JSON response
 func (resp *Response) UnprocessableEntity(v interface{}) {
 	resp.writeResponse(http.StatusUnprocessableEntity, v)
@@ -40,4 +50,9 @@ func (resp *Response) UnprocessableEntity(v interface{}) {
 // InternalServerError returns a 500 Internal Server Error JSON response
 func (resp *Response) InternalServerError(v interface{}) {
 	resp.writeResponse(http.StatusInternalServerError, v)
+}
+
+// NotImplemented returns a 501 Not Implemented JSON response
+func (resp *Response) NotImplemented(v interface{}) {
+	resp.writeResponse(http.StatusNotImplemented, v)
 }

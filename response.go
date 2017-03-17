@@ -27,7 +27,7 @@ func (resp *Response) DeleteHeader(key string) *Response {
 	return resp
 }
 
-// AddHeader adds a single header to the repsonse
+// AddHeader adds a single header to the response
 func (resp *Response) AddHeader(key string, value string) *Response {
 	resp.Writer.Header().Add(key, value)
 	return resp
