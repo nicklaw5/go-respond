@@ -35,11 +35,11 @@ func (resp *Response) AddHeader(key string, value string) *Response {
 
 // WriteResponse writes the HTTP response status, headers and body
 func (resp *Response) writeResponse(code int, v interface{}) error {
-	resp.writeStatusCode(code)
-
 	if len(resp.Headers) > 0 {
 		resp.writeHeaders()
 	}
+
+	resp.writeStatusCode(code)
 
 	if v != nil {
 		body, err := json.Marshal(v)
