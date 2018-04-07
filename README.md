@@ -21,29 +21,28 @@ The goal of `go-respond` is to take most of the grunt work out preparing your JS
 package main
 
 import (
-	"net/http"
+    "net/http"
 
-	resp "github.com/nicklaw5/go-respond"
+    resp "github.com/nicklaw5/go-respond"
 )
 
 type User struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+    ID    int    `json:"id"`
+    Name  string `json:"name"`
+    Email string `json:"email"`
 }
 
 func main() {
-	http.HandleFunc("/api/users", func(w http.ResponseWriter, r *http.Request) {
-		users := []User{
-  		    {1, "Billy", "billy@example.com"},
-  		    {2, "Joan", "joan@example.com"},
-  	  	}
+    http.HandleFunc("/api/users", func(w http.ResponseWriter, r *http.Request) {
+        users := []User{
+            {1, "Billy", "billy@example.com"},
+            {2, "Joan", "joan@example.com"},
+        }
 
-		resp.NewResponse(w).
-			Ok(users)
-	})
+        resp.NewResponse(w).Ok(users)
+    })
 
-	http.ListenAndServe(":8080", nil)
+    http.ListenAndServe(":8080", nil)
 }
 ```
 
@@ -79,36 +78,35 @@ The best option for handling errors that may occur while marshalling the JSON re
 package main
 
 import (
-  "net/http"
+    "net/http"
 
-  "github.com/urfave/negroni"
-  resp "github.com/nicklaw5/go-respond"
+    "github.com/urfave/negroni"
+    resp "github.com/nicklaw5/go-respond"
 )
 
 type Response struct {
-	Success bool `json:"success"`
+    Success bool `json:"success"`
 }
 
 func main() {
-  mux := http.NewServeMux()
-  mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-	  resp.NewResponse(w).
-		  Ok(&Response{true})
-  })
+    mux := http.NewServeMux()
+    mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+        resp.NewResponse(w).Ok(&Response{true})
+    })
 
-  n := negroni.New()
-  recovery := negroni.NewRecovery()
-  recovery.ErrorHandlerFunc = func(error interface{}) {
-      // do something with the unexpected error
-  }
+    n := negroni.New()
+    recovery := negroni.NewRecovery()
+    recovery.ErrorHandlerFunc = func(error interface{}) {
+        // do something with the unexpected error
+    }
 
-  n.Use(recovery)
-  n.UseHandler(mux)
+    n.Use(recovery)
+    n.UseHandler(mux)
 
-  http.ListenAndServe(":8080", n)
+    http.ListenAndServe(":8080", n)
 }
 ```
 
-# License
+## License
 
 This package is distributed under the terms of the [MIT](LICENSE) License.
