@@ -14,6 +14,8 @@ type Error struct {
 }
 
 func TestBadRequest(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
@@ -34,6 +36,8 @@ func TestBadRequest(t *testing.T) {
 }
 
 func TestUnauthorized(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
@@ -54,6 +58,8 @@ func TestUnauthorized(t *testing.T) {
 }
 
 func TestForbidden(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
@@ -74,6 +80,8 @@ func TestForbidden(t *testing.T) {
 }
 
 func TestNotFound(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
@@ -94,6 +102,8 @@ func TestNotFound(t *testing.T) {
 }
 
 func TestMethodNotAllowed(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
@@ -114,6 +124,8 @@ func TestMethodNotAllowed(t *testing.T) {
 }
 
 func TestConflict(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -134,6 +146,8 @@ func TestConflict(t *testing.T) {
 }
 
 func TestLengthRequired(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -154,6 +168,8 @@ func TestLengthRequired(t *testing.T) {
 }
 
 func TestPreconditionFailed(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -174,6 +190,8 @@ func TestPreconditionFailed(t *testing.T) {
 }
 
 func TestUnprocessableEntity(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -194,6 +212,8 @@ func TestUnprocessableEntity(t *testing.T) {
 }
 
 func TestInternalServerError(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -214,6 +234,8 @@ func TestInternalServerError(t *testing.T) {
 }
 
 func TestNotImplemented(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()

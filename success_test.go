@@ -9,6 +9,8 @@ import (
 )
 
 func TestOk(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
@@ -34,6 +36,8 @@ type User struct {
 }
 
 func TestCreated(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -60,6 +64,8 @@ func TestCreated(t *testing.T) {
 }
 
 func TestAccepted(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -79,6 +85,8 @@ func TestAccepted(t *testing.T) {
 }
 
 func TestNoContent(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()

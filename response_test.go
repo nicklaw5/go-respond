@@ -42,7 +42,9 @@ func validateResponseHeader(responseHeaderValue string, expectedHeaderValue stri
 	return nil
 }
 
-func TestContentTyoeHeader(t *testing.T) {
+func TestContentTypeHeader(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -59,6 +61,8 @@ func TestContentTyoeHeader(t *testing.T) {
 }
 
 func TestAddHeader(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "POST")
 
 	rr := httptest.NewRecorder()
@@ -80,6 +84,8 @@ func TestAddHeader(t *testing.T) {
 }
 
 func TestDeleteHeader(t *testing.T) {
+	t.Parallel()
+
 	req := newRequest(t, "GET")
 
 	rr := httptest.NewRecorder()
