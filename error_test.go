@@ -254,3 +254,55 @@ func TestNotImplemented(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 }
+
+var testData = []struct {
+	testName string
+
+	inputHttpVerb string
+	inputHttpCode int
+	inputJsonData string
+
+	methodUnderTest func(r *resp.Response, v interface{})
+
+	expectedStatus int
+	expectedBody   string
+}{
+	{"502 Bad Gateway",
+		/*input*/ "POST", 502, "Bad Gateway - sample error content",
+		/*method under test*/ (*resp.Response).BadGateway,
+		/*expected*/ http.StatusBadGateway, `{"code":502,"message":"Bad Gateway - sample error content"}`},
+
+	{"503 Service Unavailable",
+		/*input*/ "POST", 503, "Service Unavailable - sample error content",
+		/*method under test*/ (*resp.Response).ServiceUnavailable,
+		/*expected*/ http.StatusServiceUnavailable, `{"code":503,"message":"Service Unavailable - sample error content"}`},
+	{"504 Gateway Timeout",
+		/*input*/ "POST", 504, "Gateway Timeout - sample error content",
+		/*method under test*/ (*resp.Response).GatewayTimeout,
+		/*expected*/ http.StatusGatewayTimeout, `{"code":504,"message":"Gateway Timeout - sample error content"}`},
+}
+
+func TestErrorResponses(t *testing.T) {
+	for _, datum := range testData {
+		t.Run(datum.testName, func(t *testing.T) {
+			// t.Parallel()
+			req := newRequest(t, datum.inputHttpVerb)
+
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				resp := resp.NewResponse(w)
+				datum.methodUnderTest(resp, &Error{datum.inputHttpCode, datum.inputJsonData})
+			})
+			handler.ServeHTTP(rr, req)
+
+			if err := validateStatusCode(rr.Code, datum.expectedStatus); err != nil {
+				t.Fatal(err.Error())
+			}
+
+			expected := datum.expectedBody
+			if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+				t.Fatal(err.Error())
+			}
+		})
+	}
+}
