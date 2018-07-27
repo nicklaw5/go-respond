@@ -284,8 +284,10 @@ var testData = []struct {
 
 func TestErrorResponses(t *testing.T) {
 	for _, datum := range testData {
+		datum := datum
 		t.Run(datum.testName, func(t *testing.T) {
-			// t.Parallel()
+			t.Parallel()
+
 			req := newRequest(t, datum.inputHttpVerb)
 
 			rr := httptest.NewRecorder()
