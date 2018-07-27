@@ -56,3 +56,18 @@ func (resp *Response) InternalServerError(v interface{}) {
 func (resp *Response) NotImplemented(v interface{}) {
 	resp.writeResponse(http.StatusNotImplemented, v)
 }
+
+// BadGateway returns a 502 Bad Gateway JSON response
+func (resp *Response) BadGateway(v interface{}) {
+	resp.writeResponse(http.StatusBadGateway, v)
+}
+
+// ServiceUnavailable returns a 503 Service Unavailable JSON response
+func (resp *Response) ServiceUnavailable(v interface{}) {
+	resp.writeResponse(http.StatusServiceUnavailable, v)
+}
+
+// GatewayTimeout returns a 504 Gateway Timeout JSON response
+func (resp *Response) GatewayTimeout(v interface{}) {
+	resp.writeResponse(http.StatusGatewayTimeout, v)
+}

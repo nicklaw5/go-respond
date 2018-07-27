@@ -65,6 +65,9 @@ func main() {
 | 422 | UnprocessableEntity() |
 | 500 | InternalServerError() |
 | 501 | NotImplemented() |
+| 502 | BadGateway() |
+| 503 | ServiceUnavailable() |
+| 504 | GatewayTimeout() |
 
 See [here](https://httpstatuses.com/) for a complete list of HTTP responses, along with an explanation of each.
 
