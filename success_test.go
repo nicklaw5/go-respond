@@ -1,11 +1,9 @@
-package respond_test
+package respond
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	resp "github.com/nicklaw5/go-respond"
 )
 
 func TestOk(t *testing.T) {
@@ -15,7 +13,7 @@ func TestOk(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			Ok(nil)
 	})
 	handler.ServeHTTP(rr, req)
@@ -47,7 +45,7 @@ func TestCreated(t *testing.T) {
 			{2, "Joan", "joan@example.com"},
 		}
 
-		resp.NewResponse(w).
+		NewResponse(w).
 			Created(users)
 	})
 	handler.ServeHTTP(rr, req)
@@ -70,7 +68,7 @@ func TestAccepted(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
+		res := NewResponse(w)
 		res.Accepted(nil)
 	})
 	handler.ServeHTTP(rr, req)
@@ -91,7 +89,7 @@ func TestNoContent(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
+		res := NewResponse(w)
 		res.NoContent()
 	})
 	handler.ServeHTTP(rr, req)

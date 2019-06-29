@@ -1,11 +1,9 @@
-package respond_test
+package respond
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	resp "github.com/nicklaw5/go-respond"
 )
 
 type Error struct {
@@ -20,7 +18,7 @@ func TestBadRequest(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			BadRequest(&Error{400, "An error occurred"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -42,7 +40,7 @@ func TestUnauthorized(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			Unauthorized(&Error{401, "Unauthorized"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -64,7 +62,7 @@ func TestForbidden(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			Forbidden(&Error{403, "Forbidden"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -86,7 +84,7 @@ func TestNotFound(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			NotFound(&Error{404, "Not found"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -108,7 +106,7 @@ func TestMethodNotAllowed(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			MethodNotAllowed(&Error{405, "Method not allowed"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -130,7 +128,7 @@ func TestConflict(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
+		res := NewResponse(w)
 		res.Conflict(&Error{409, "Username already take"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -152,7 +150,7 @@ func TestLengthRequired(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
+		res := NewResponse(w)
 		res.LengthRequired(&Error{411, "Content-Type header not long enough"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -174,7 +172,7 @@ func TestPreconditionFailed(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
+		res := NewResponse(w)
 		res.PreconditionFailed(&Error{412, "X-Auth-Key header is not present"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -196,7 +194,7 @@ func TestUnprocessableEntity(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			UnprocessableEntity(&Error{422, "Unprocessable entity"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -218,7 +216,7 @@ func TestInternalServerError(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			InternalServerError(&Error{500, "An unexpected error occurred"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -240,7 +238,7 @@ func TestNotImplemented(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			NotImplemented(&Error{501, "Unsupported request"})
 	})
 	handler.ServeHTTP(rr, req)
@@ -262,23 +260,23 @@ var testData = []struct {
 	inputHttpCode int
 	inputJsonData string
 
-	methodUnderTest func(r *resp.Response, v interface{})
+	methodUnderTest func(r *Response, v interface{})
 
 	expectedStatus int
 	expectedBody   string
 }{
 	{"502 Bad Gateway",
 		/*input*/ "POST", 502, "Bad Gateway - sample error content",
-		/*method under test*/ (*resp.Response).BadGateway,
+		/*method under test*/ (*Response).BadGateway,
 		/*expected*/ http.StatusBadGateway, `{"code":502,"message":"Bad Gateway - sample error content"}`},
 
 	{"503 Service Unavailable",
 		/*input*/ "POST", 503, "Service Unavailable - sample error content",
-		/*method under test*/ (*resp.Response).ServiceUnavailable,
+		/*method under test*/ (*Response).ServiceUnavailable,
 		/*expected*/ http.StatusServiceUnavailable, `{"code":503,"message":"Service Unavailable - sample error content"}`},
 	{"504 Gateway Timeout",
 		/*input*/ "POST", 504, "Gateway Timeout - sample error content",
-		/*method under test*/ (*resp.Response).GatewayTimeout,
+		/*method under test*/ (*Response).GatewayTimeout,
 		/*expected*/ http.StatusGatewayTimeout, `{"code":504,"message":"Gateway Timeout - sample error content"}`},
 }
 
@@ -292,7 +290,7 @@ func TestErrorResponses(t *testing.T) {
 
 			rr := httptest.NewRecorder()
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp := resp.NewResponse(w)
+				resp := NewResponse(w)
 				datum.methodUnderTest(resp, &Error{datum.inputHttpCode, datum.inputJsonData})
 			})
 			handler.ServeHTTP(rr, req)
