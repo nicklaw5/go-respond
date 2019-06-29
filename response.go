@@ -7,8 +7,15 @@ import (
 
 // Response is the HTTP response
 type Response struct {
-	Writer  http.ResponseWriter
-	Headers map[string]string
+	Writer     http.ResponseWriter
+	Headers    map[string]string
+	DefMessage bool
+}
+
+// DefaultMessageResponse is for transporting a default http message
+type DefaultMessageResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
 
 // NewResponse creates and returns a new response
@@ -19,6 +26,11 @@ func NewResponse(w http.ResponseWriter) *Response {
 			"Content-Type": "application/json; charset=utf-8",
 		},
 	}
+}
+
+func (resp *Response) DefaultMessage() *Response {
+	resp.DefMessage = true
+	return resp
 }
 
 // DeleteHeader deletes a single header from the response
@@ -41,16 +53,24 @@ func (resp *Response) writeResponse(code int, v interface{}) error {
 
 	resp.writeStatusCode(code)
 
+	if v == nil && resp.DefMessage {
+		v = DefaultMessageResponse{
+			Status:  code,
+			Message: http.StatusText(code),
+		}
+	}
+
 	if v != nil {
 		body, err := json.Marshal(v)
 		if err != nil {
 			panic(err)
 		}
-
+		// can just return an error when connection is hijacked or content-size is longer then declared.
 		if _, err := resp.Writer.Write(body); err != nil {
 			panic(err)
 		}
 	}
+
 	return nil
 }
 
