@@ -3,7 +3,6 @@ package respond
 import (
 	"errors"
 	"fmt"
-	resp "github.com/nicklaw5/go-respond"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -48,7 +47,7 @@ func TestDefaultMessage(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).DefaultMessage().
+		NewResponse(w).DefaultMessage().
 			Unauthorized(nil)
 	})
 	handler.ServeHTTP(rr, req)
@@ -71,7 +70,7 @@ func TestRespondInvalidType(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).DefaultMessage().
+		NewResponse(w).DefaultMessage().
 			Unauthorized(make(chan int))
 	})
 	handler.ServeHTTP(rr, req)
