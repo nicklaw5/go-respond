@@ -1,4 +1,4 @@
-package respond_test
+package respond
 
 import (
 	"errors"
@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	resp "github.com/nicklaw5/go-respond"
 )
 
 func newRequest(t *testing.T, method string) *http.Request {
@@ -49,7 +47,7 @@ func TestContentTypeHeader(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			Ok(nil)
 	})
 	handler.ServeHTTP(rr, req)
@@ -67,7 +65,7 @@ func TestAddHeader(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp.NewResponse(w).
+		NewResponse(w).
 			AddHeader("foo", "bar").
 			AddHeader("ping", "pong").
 			Ok(nil)
@@ -90,7 +88,7 @@ func TestDeleteHeader(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := resp.NewResponse(w)
+		res := NewResponse(w)
 
 		res.AddHeader("foo", "bar").
 			Ok(nil)
