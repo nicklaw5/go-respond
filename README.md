@@ -73,6 +73,34 @@ See [here](https://httpstatuses.com/) for a complete list of HTTP responses, alo
 
 Please submit a PR if you want to add to this list. Only the most common response types have been included.
 
+## To Long, Don't Write
+
+Sometimes you don't need to return a specific content-message but don't want the response body to be empty.
+In this case you can use the `DefaultMessage()` for responding with json containing the default message for the corresponding status code.
+
+```go
+package main
+
+import (
+    "net/http"
+    resp "github.com/nicklaw5/go-respond"
+)
+
+func main() {
+    http.HandleFunc("/api/users", func(w http.ResponseWriter, r *http.Request) {
+        // ...
+        if !authenticated {
+            resp.NewResponse(w).DefaultMessage().
+                Unauthorized(nil)
+        }
+        // ...
+    })
+    http.ListenAndServe(":8080", nil)
+}
+```
+
+Would respond with `{"status":401,"message":"Unauthorized"}`
+
 ## Handling Errors
 
 The best option for handling errors that may occur while marshalling the JSON response, is to use [Negroni's Recovery middleware](https://github.com/urfave/negroni#recovery). Here's an example:

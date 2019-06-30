@@ -40,6 +40,42 @@ func validateResponseHeader(responseHeaderValue string, expectedHeaderValue stri
 	return nil
 }
 
+func TestDefaultMessage(t *testing.T) {
+	t.Parallel()
+
+	req := newRequest(t, "GET")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		NewResponse(w).DefaultMessage().
+			Unauthorized(nil)
+	})
+	handler.ServeHTTP(rr, req)
+
+	if err := validateResponseBody(rr.Body.String(), "{\"status\":401,\"message\":\"Unauthorized\"}"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestRespondInvalidType(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("responding with invalid type (channel) should have caused a panic")
+		}
+	}()
+
+	t.Parallel()
+
+	req := newRequest(t, "GET")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		NewResponse(w).DefaultMessage().
+			Unauthorized(make(chan int))
+	})
+	handler.ServeHTTP(rr, req)
+}
+
 func TestContentTypeHeader(t *testing.T) {
 	t.Parallel()
 
