@@ -42,6 +42,11 @@ func (resp *Response) PreconditionFailed(v interface{}) {
 	resp.writeResponse(http.StatusPreconditionFailed, v)
 }
 
+// UnsupportedMediaType returns a 415 Unsupported Media Type JSON response
+func (resp *Response) UnsupportedMediaType(v interface{}) {
+	resp.writeResponse(http.StatusUnsupportedMediaType, v)
+}
+
 // UnprocessableEntity returns a 422 Unprocessable Entity JSON response
 func (resp *Response) UnprocessableEntity(v interface{}) {
 	resp.writeResponse(http.StatusUnprocessableEntity, v)

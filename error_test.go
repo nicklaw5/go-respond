@@ -187,6 +187,28 @@ func TestPreconditionFailed(t *testing.T) {
 	}
 }
 
+func TestUnsupportedMediaType(t *testing.T) {
+	t.Parallel()
+
+	req := newRequest(t, "POST")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := NewResponse(w)
+		res.UnsupportedMediaType(&Error{415, "Unsupported Media Type"})
+	})
+	handler.ServeHTTP(rr, req)
+
+	if err := validateStatusCode(rr.Code, http.StatusUnsupportedMediaType); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	expected := `{"code":415,"message":"Unsupported Media Type"}`
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
 func TestUnprocessableEntity(t *testing.T) {
 	t.Parallel()
 
