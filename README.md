@@ -62,6 +62,8 @@ func main() {
 | 409 | Conflict() |
 | 411 | LengthRequired() |
 | 412 | PreconditionFailed() |
+| 413 | RequestEntityTooLarge() |
+| 415 | UnsupportedMediaType() |
 | 422 | UnprocessableEntity() |
 | 500 | InternalServerError() |
 | 501 | NotImplemented() |
