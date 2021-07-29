@@ -2,15 +2,10 @@
 
 A Go package for handling common HTTP JSON responses.
 
-[![GoDoc](https://godoc.org/github.com/nicklaw5/go-respond?status.svg)](https://godoc.org/github.com/nicklaw5/go-respond)
-[![Build Status](https://travis-ci.org/nicklaw5/go-respond.svg?branch=master)](https://travis-ci.org/nicklaw5/go-respond)
-[![Coverage Status](https://coveralls.io/repos/github/nicklaw5/go-respond/badge.svg)](https://coveralls.io/github/nicklaw5/go-respond)
-[![Go Report Card](https://goreportcard.com/badge/github.com/nicklaw5/go-respond)](https://goreportcard.com/report/github.com/nicklaw5/go-respond)
-
 ## Installation
 
 ```bash
-go get github.com/nicklaw5/go-respond
+go get github.com/kasulani/go-respond
 ```
 
 ## Usage
@@ -23,7 +18,7 @@ package main
 import (
     "net/http"
 
-    resp "github.com/nicklaw5/go-respond"
+    resp "github.com/kasulani/go-respond"
 )
 
 type User struct {
@@ -85,7 +80,7 @@ package main
 
 import (
     "net/http"
-    resp "github.com/nicklaw5/go-respond"
+    resp "github.com/kasulani/go-respond"
 )
 
 func main() {
@@ -114,7 +109,7 @@ import (
     "net/http"
 
     "github.com/urfave/negroni"
-    resp "github.com/nicklaw5/go-respond"
+    resp "github.com/kasulani/go-respond"
 )
 
 type Response struct {
