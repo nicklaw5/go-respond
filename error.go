@@ -27,6 +27,11 @@ func (resp *Response) MethodNotAllowed(v interface{}) {
 	resp.writeResponse(http.StatusMethodNotAllowed, v)
 }
 
+// NotAcceptable returns a 406 Not Acceptable JSON response
+func (resp *Response) NotAcceptable(v interface{}) {
+	resp.writeResponse(http.StatusNotAcceptable, v)
+}
+
 // Conflict returns a 409 Conflict JSON response
 func (resp *Response) Conflict(v interface{}) {
 	resp.writeResponse(http.StatusConflict, v)
