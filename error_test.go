@@ -143,6 +143,28 @@ func TestConflict(t *testing.T) {
 	}
 }
 
+func TestGone(t *testing.T) {
+	t.Parallel()
+
+	req := newRequest(t, "POST")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := NewResponse(w)
+		res.Gone(&Error{410, "Service gone"})
+	})
+	handler.ServeHTTP(rr, req)
+
+	if err := validateStatusCode(rr.Code, http.StatusGone); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	expected := `{"code":410,"message":"Service gone"}`
+	if err := validateResponseBody(rr.Body.String(), expected); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
 func TestLengthRequired(t *testing.T) {
 	t.Parallel()
 
